@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LD LATTE | Статистика Instagram</title>
+<style>
+:root { color-scheme: light; --ink: #382b25; --muted: #76665c; --line: #e2d8ce; --paper: #fffcf7; --canvas: #f3ede5; --soft: #f5eee5; --accent: #6b4530; --tint: #eee1d3; font-family: 'Segoe UI', Arial, sans-serif; font-size: 22px; line-height: 1.45; color: var(--ink); background: var(--canvas); }
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+button:disabled { cursor: default; opacity: .3; }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: 62px; font-weight: 600; letter-spacing: -.04em; line-height: 1.12; }
+h2 { font-size: 47px; font-weight: 600; letter-spacing: -.035em; line-height: 1.18; }
+h3 { font-size: 26px; font-weight: 600; line-height: 1.25; }
+h1:focus, h2:focus { outline: none; }
+code { font-family: 'DejaVu Sans Mono', monospace; font-size: .8em; overflow-wrap: anywhere; }
+small { font-size: 17px; color: var(--muted); }
+svg { display: block; }
+[hidden] { display: none !important; }
+.sidebar, .topbar, .pager { display: none; }
+.skip-link { position: absolute; left: 20px; top: -100px; padding: 12px; background: white; z-index: 20; }
+.skip-link:focus { top: 12px; }
+#deck { max-width: 1920px; margin: auto; }
+.page { background: var(--paper); padding: 44px 52px 100px; margin: 20px; border: 1px solid var(--line); border-radius: 14px; position: relative; }
+.eyebrow { font-size: 14px; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); margin-bottom: 13px; }
+.lead { font-size: 23px; color: var(--muted); line-height: 1.5; margin-top: 17px; max-width: 1320px; }
+.section-head { margin-bottom: 30px; }
+.grid { display: grid; gap: 22px; }
+.cols-2 { grid-template-columns: 1fr 1fr; }
+.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.card { border: 1px solid var(--line); border-radius: 12px; padding: 26px; background: var(--paper); }
+.card p { color: var(--muted); font-size: 20px; margin-top: 12px; line-height: 1.5; }
+.card small { display: block; margin-top: 13px; }
+.card.selected { border: 2px solid var(--accent); background: var(--tint); padding: 25px; }
+.pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: white; border-radius: 50px; padding: 7px 14px; font-size: 15px; line-height: 1.2; color: var(--muted); }
+.pill.strong { background: var(--accent); border-color: var(--accent); color: white; }
+.card-head { display: flex; justify-content: space-between; gap: 14px; align-items: center; margin-bottom: 26px; }
+.card-index { font-size: 16px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.route-icon { width: 54px; height: 54px; display: grid; place-items: center; background: white; border: 1px solid var(--line); border-radius: 13px; font-size: 22px; font-weight: 600; }
+.route-meta { display: flex; gap: 7px; flex-wrap: wrap; margin: 23px 0 17px; }
+.rule { display: flex; align-items: center; gap: 18px; padding: 19px 23px; margin-top: 24px; border-radius: 10px; background: var(--soft); font-size: 20px; }
+.rule .symbol { flex: 0 0 28px; width: 28px; height: 28px; border: 1px solid #8797a0; border-radius: 50%; display: grid; place-items: center; font-size: 17px; }
+.rule p { color: var(--muted); }
+.rule strong { color: var(--ink); font-weight: 600; }
+.text-button { border: 0; background: transparent; padding: 0 0 3px; border-bottom: 1px solid #9caeb8; color: var(--accent); font-size: 18px; }
+.detail-link { display: flex; gap: 24px; align-items: center; margin-top: 24px; }
+.slide-footer { position: absolute; bottom: 24px; left: 52px; right: 52px; border-top: 1px solid var(--line); padding-top: 16px; min-height: 60px; display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 15px; }
+.footer-context { display: flex; gap: 22px; align-items: center; }
+.refs { display: flex; gap: 9px; font-size: 14px; }
+.refs a { text-decoration: none; border-bottom: 1px solid #9babb4; }
+.pager { align-items: center; gap: 18px; }
+.pager :is(button, a) { width: 60px; height: 48px; border: 1px solid #c9d5dc; background: white; border-radius: 10px; color: var(--ink); display: grid; place-items: center; }
+.pager :is(button, a):not(:disabled):hover { background: var(--tint); border-color: var(--accent); }
+.pager :is(button, a):last-child:not(:disabled) { background: var(--ink); color: white; border-color: var(--ink); }
+.pager svg { width: 24px; height: 24px; }
+.pager .counter { font-size: 17px; font-variant-numeric: tabular-nums; min-width: 76px; text-align: center; }
+.flow-layout { display: grid; grid-template-columns: 1fr 340px; gap: 26px; align-items: stretch; }
+.flow-panel { border: 1px solid var(--line); border-radius: 12px; background: var(--soft); padding: 18px; }
+.flow-panel svg { width: 100%; height: 550px; }
+.flow-panel text { font-family: 'Segoe UI', Arial, sans-serif; fill: var(--ink); }
+.flow-node { cursor: pointer; }
+.flow-node .node-bg { fill: var(--paper); stroke: #cabbac; stroke-width: 1.5; }
+.flow-node:hover .node-bg { stroke: var(--accent); stroke-width: 2; }
+.flow-node[aria-pressed='true'] .node-bg { fill: var(--tint); stroke: var(--accent); stroke-width: 2.5; }
+.flow-node .node-label { font-size: 19px; font-weight: 600; }
+.flow-node .node-sub { font-size: 15px; fill: var(--muted); }
+.flow-node .node-num { font-size: 13px; fill: var(--muted); }
+.flow-caption { font-size: 14px; fill: var(--muted) !important; }
+#arrow path { fill: #8a715e; }
+.flow-panel svg > g[marker-end] { stroke: #8a715e; }
+.stage-card { padding: 29px; background: var(--tint); border: 1px solid #dccab7; border-radius: 12px; display: flex; flex-direction: column; }
+.stage-card .big-index { font-size: 54px; font-weight: 300; letter-spacing: -.04em; color: var(--muted); margin-bottom: 24px; line-height: 1; }
+.stage-card h3 { font-size: 27px; }
+.stage-card p { font-size: 20px; color: var(--muted); margin-top: 20px; }
+.stage-check { margin-top: auto; padding-top: 24px; font-size: 18px; border-top: 1px solid #dccab7; }
+.stage-check span { display: block; color: var(--muted); font-size: 14px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+.flow-caption-row { display: flex; gap: 18px; margin-top: 21px; align-items: center; font-size: 19px; color: var(--muted); }
+.flow-caption-row .line { height: 1px; flex: 1; background: var(--line); }
+.role-column { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.role-title { padding: 21px 25px; background: var(--soft); display: flex; gap: 15px; align-items: center; }
+.role-title h3 { font-size: 24px; }
+.role-title .role-symbol { font-size: 26px; color: var(--muted); }
+.role-steps { padding: 24px; }
+.role-step { display: grid; grid-template-columns: 30px 1fr; gap: 12px; position: relative; min-height: 139px; }
+.role-step:last-child { min-height: 104px; }
+.role-step:not(:last-child)::after { content: ''; position: absolute; left: 14px; top: 35px; bottom: 8px; width: 1px; background: var(--line); }
+.step-num { width: 29px; height: 29px; background: var(--soft); border: 1px solid var(--line); border-radius: 50%; font-size: 14px; display: grid; place-items: center; }
+.role-step h4 { font-size: 21px; margin: 1px 0 7px; font-weight: 600; }
+.role-step p { font-size: 19px; color: var(--muted); line-height: 1.45; }
+.access-lane { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 26px; }
+.access-step { border: 1px solid var(--line); border-radius: 12px; padding: 25px; position: relative; }
+.access-step:not(:last-child)::after { content: ''; position: absolute; left: calc(100% + 10px); top: 50%; width: 8px; height: 8px; border-top: 2px solid var(--muted); border-right: 2px solid var(--muted); transform: translate(-50%, -50%) rotate(45deg); pointer-events: none; }
+.access-step .term { font-size: 35px; font-weight: 400; letter-spacing: -.03em; margin: 23px 0 8px; }
+.access-step p { font-size: 19px; color: var(--muted); }
+.access-step small { display: block; margin-top: 15px; }
+.mini-title { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+.access-bottom { display: grid; grid-template-columns: 1.15fr 1fr; gap: 24px; margin-top: 28px; }
+.access-bottom .card { padding: 24px 26px; }
+.access-bottom h3 { font-size: 23px; }
+.access-bottom p { font-size: 19px; }
+.page { --metric-column-one: 23%; --metric-column-two: 31%; }
+.metric-table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; font-size: 20px; }
+.metric-table th { background: var(--soft); text-align: left; font-size: 15px; font-weight: 600; color: var(--muted); padding: 17px 20px; }
+.metric-table td { vertical-align: top; padding: 22px 20px; border-bottom: 1px solid var(--line); }
+.metric-table th:first-child { border-radius: 9px 0 0 9px; width: var(--metric-column-one); }
+.metric-table th:nth-child(2) { width: var(--metric-column-two); }
+.metric-table th:last-child { border-radius: 0 9px 9px 0; }
+.metric-table td p { font-size: 18px; color: var(--muted); margin-top: 6px; }
+.metric-table strong { font-weight: 600; }
+.metric-table .tag { display: block; font-size: 14px; color: var(--accent); margin-top: 10px; }
+.compare-strip { display: grid; grid-template-columns: var(--metric-column-one) var(--metric-column-two) 1fr; border: 1px solid var(--line); border-radius: 10px; margin-top: 26px; }
+.compare-strip div { min-width: 0; padding: 20px; }
+.compare-strip div + div { border-left: 1px solid var(--line); }
+.compare-strip b { display: block; font-size: 19px; font-weight: 600; }
+.compare-strip span { display: block; font-size: 17px; color: var(--muted); margin-top: 6px; }
+.schedule { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.schedule-head, .schedule-row { display: grid; grid-template-columns: 230px 1fr 330px; align-items: center; }
+.schedule-head { background: var(--soft); padding: 16px 24px; font-size: 14px; color: var(--muted); }
+.schedule-head div:nth-child(2) { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; }
+.schedule-row { padding: 23px 24px; border-top: 1px solid var(--line); }
+.schedule-row strong { font-size: 20px; font-weight: 600; }
+.schedule-row small { display: block; font-size: 15px; margin-top: 6px; }
+.schedule-row .description { padding-left: 26px; font-size: 18px; color: var(--muted); }
+.day-marks { display: grid; grid-template-columns: repeat(7, 1fr); align-items: center; justify-items: center; gap: 10px; position: relative; }
+.day-marks::before { content: ''; width: calc(100% - 40px); height: 1px; background: #c9d5dc; position: absolute; top: 50%; }
+.day-marks i { width: 18px; height: 18px; background: #84654e; border: 4px solid var(--paper); border-radius: 50%; box-shadow: 0 0 0 1px #a9bac4; position: relative; }
+.day-marks i.optional { background: white; }
+.day-marks .window { z-index: 1; grid-column: 1 / -1; background: var(--tint); border: 1px solid #cdb9a4; border-radius: 7px; width: 100%; padding: 10px; text-align: center; font-size: 17px; }
+.retention { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 24px; }
+.retention .card { padding: 18px 22px; }
+.retention .term { font-size: 30px; font-weight: 400; letter-spacing: -.025em; }
+.retention p { font-size: 17px; margin-top: 6px; }
+.check-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.check-card { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; padding: 23px 25px; }
+.check-card .check-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 17px; }
+.check-card h3 { font-size: 23px; }
+.check-card p { flex: 1; font-size: 19px; color: var(--muted); margin-top: 11px; }
+.check-card .expected { display: flex; flex-shrink: 0; min-height: 64px; gap: 8px; font-size: 17px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.check-card .expected span { color: var(--accent); font-size: 21px; line-height: 1; }
+.questions { display: grid; grid-template-columns: 1fr 1fr; gap: 21px; }
+.question { display: grid; grid-template-columns: 43px 1fr; gap: 18px; padding: 25px 27px; border: 1px solid var(--line); border-radius: 12px; }
+.question .number { font-size: 30px; font-weight: 300; color: var(--muted); line-height: 1; }
+.question h3 { font-size: 23px; }
+.question p { font-size: 20px; color: var(--muted); margin-top: 10px; }
+.sources { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 30px; margin-top: 26px; padding: 0; list-style: none; }
+.sources li { border-bottom: 1px solid var(--line); padding: 15px 0; display: grid; grid-template-columns: 30px 1fr; gap: 12px; font-size: 20px; }
+.sources .source-index { color: var(--muted); font-size: 15px; padding-top: 4px; }
+.sources small { display: block; margin-top: 7px; font-size: 17px; }
+.sources li:focus { outline: 2px solid var(--accent); outline-offset: 5px; }
+dialog { border: 1px solid var(--line); border-radius: 16px; padding: 0; background: var(--paper); color: var(--ink); max-width: min(1100px, 90vw); width: 1100px; max-height: 86vh; box-shadow: 0 25px 100px #182d3e33; }
+dialog::backdrop { background: #172c3d80; backdrop-filter: blur(4px); }
+.dialog-head { padding: 27px 34px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--paper); z-index: 1; }
+.dialog-head h2 { font-size: 27px; letter-spacing: -.02em; }
+.dialog-head button { width: 42px; height: 42px; background: var(--soft); border: 1px solid var(--line); border-radius: 9px; font-size: 24px; }
+.dialog-body { padding: 26px 34px 34px; font-size: 18px; }
+.dialog-body h3 { font-size: 21px; margin: 20px 0 10px; }
+.dialog-body h3:first-child { margin-top: 0; }
+.dialog-body p, .dialog-body li { color: var(--muted); margin: 10px 0; }
+.dialog-body table { width: 100%; border-collapse: collapse; font-size: 17px; margin-top: 12px; }
+.dialog-body th, .dialog-body td { padding: 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+.dialog-body th { background: var(--soft); font-size: 14px; }
+@media all {
+  .enhanced { overflow: hidden; }
+  .enhanced #deck { position: fixed; width: var(--deck-width, 1920px); height: var(--deck-height, 1080px); max-width: none; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(var(--deck-scale, 1)); transform-origin: center; }
+  .enhanced .sidebar { display: flex; flex-direction: column; position: absolute; inset: 0 auto 0 0; width: 250px; background: #38271f; color: #faf1e7; padding: 18px 20px; }
+  .brand { padding: 0 16px; font-size: 29px; letter-spacing: .07em; font-weight: 600; }
+  .brand span { display: block; font-size: 15px; letter-spacing: .02em; color: #d8c3b0; font-weight: 400; margin-top: 10px; }
+  .nav-label { font-size: 12px; color: #cbb39c; letter-spacing: .14em; margin: 28px 16px 20px; }
+  #slide-nav { display: flex; flex-direction: column; gap: 7px; }
+  .nav-item { background: transparent; border: 0; color: #e3d3c3; font-size: 18px; display: flex; gap: 17px; padding: 17px 16px; text-align: left; align-items: center; border-radius: 9px; }
+  .nav-item:hover { background: #513a2d; }
+  .nav-item[aria-current] { background: #f3e8db; color: #38271f; font-weight: 600; }
+  .nav-number { font-size: 13px; opacity: .7; font-variant-numeric: tabular-nums; }
+  .sidebar-line { margin: auto 16px 0; height: 1px; background: #80624d; }
+  .workspace { margin-left: 250px; height: 100%; }
+  .enhanced .topbar { display: none; }
+  .page { border: 0; border-radius: 0; }
+  .sidebar-print { margin: 24px 16px 0; background: transparent; color: #e4d2c2; border: 1px solid #80624d; border-radius: 8px; padding: 12px; font-size: 15px; text-align: center; text-decoration: none; }
+  .sidebar-print + .sidebar-print { margin-top: 10px; }
+  .sidebar-print:hover { background: #513a2d; }
+  .topbar .breadcrumb { display: flex; gap: 15px; align-items: center; }
+  .topbar button { border: 1px solid #c9d5dc; background: transparent; border-radius: 8px; color: var(--ink); padding: 9px 15px; font-size: 15px; }
+  .topbar button:hover { background: white; }
+  main { padding: 0; margin: 0; max-width: none; height: 100%; }
+  .page { width: 100%; height: 100%; margin: 0; }
+  .enhanced .pager { display: flex; }
+}
+@media (prefers-reduced-motion: no-preference) { button, .flow-node .node-bg { transition: background .15s, border-color .15s, fill .15s; } }
+@media (forced-colors: active) { .nav-item[aria-current] { outline: 2px solid; } .flow-node[aria-pressed='true'] .node-bg { stroke: CanvasText; stroke-width: 3; } }
+.pdf-deck { display: none; }
+.pager a { text-decoration: none; }
+.pdf-sheet { position: relative; width: 1920px; height: 1080px; background: var(--paper); }
+.pdf-sheet .sidebar { position: absolute; }
+.pdf-sheet .sidebar-print { visibility: hidden; }
+.pdf-sheet nav { display: flex; flex-direction: column; gap: 7px; }
+.pdf-sheet .nav-item { text-decoration: none; }
+.pdf-sheet .pager a[aria-disabled='true'] { opacity: .3; pointer-events: none; }
+.pdf-sheet .text-button { text-decoration: none; }
+.pdf-sheet .detail-content { font-size: 22px; line-height: 1.5; }
+.pdf-sheet .detail-content h3 { font-size: 26px; margin: 22px 0 12px; }
+.pdf-sheet .detail-content h3:first-child { margin-top: 0; }
+.pdf-sheet .detail-content p, .pdf-sheet .detail-content li { margin: 12px 0; color: var(--muted); }
+.pdf-sheet .detail-content table { width: 100%; border-collapse: collapse; font-size: 21px; }
+.pdf-sheet .detail-content th, .pdf-sheet .detail-content td { padding: 16px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.pdf-sheet .detail-content th { background: var(--soft); font-size: 17px; }
+.pdf-sheet .return-link { font-size: 19px; }
+@media print {
+  @page { size: 1920px 1080px; margin: 0; }
+  :root { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  html, body.enhanced { margin: 0; padding: 0; overflow: visible; background: var(--paper); }
+  body > #deck, body > .sidebar, .skip-link, dialog { display: none !important; }
+  .pdf-deck { display: block; }
+  .pdf-sheet { break-after: page; break-inside: avoid; }
+  .pdf-sheet:last-child { break-after: auto; }
+  .pdf-sheet .page { display: block !important; }
+}
+</style>
+<link rel="stylesheet" href="./system.css" media="screen">
+<link rel="stylesheet" href="../shared/sidebar.css" media="screen">
+<script src="../shared/navigation.js?v=mobile-fit-2" defer></script>
+</head>
+<body>
+<aside class="sidebar ld-sidebar" aria-label="Навигация">
+  <ld-navigation section="instagram"></ld-navigation>
+  <p class="nav-label">ПЛАН ПОДКЛЮЧЕНИЯ</p>
+  <nav id="slide-nav" aria-label="Слайды"></nav>
+  <footer class="system-footer"><span>Рабочее пространство LD LATTE</span><a href="../">← Вернуться к заявкам</a></footer>
+</aside>
+<div id="deck">
+<a class="skip-link" href="#presentation">К содержанию</a>
+<div class="workspace">
+<main id="presentation">
+<section class="page" data-name="Подход" aria-labelledby="approach-title">
+<header class="section-head"><p class="eyebrow">Способ подключения</p><h1 id="approach-title">Статистика аккаунтов в единой системе отчётности</h1><p class="lead">Для базового сбора используем Instagram Login. Каждый аккаунт подключается отдельно, данные хранятся в общей базе.</p></header>
+<div class="grid cols-3">
+  <article class="card selected"><div class="card-head"><div class="route-icon" aria-hidden="true">IG</div><span class="pill strong">Основной вариант</span></div><h3>Instagram Login</h3><p>Прямое подключение профессионального аккаунта. Facebook Page и Business Portfolio не требуются.</p><div class="route-meta"><span class="pill">Business</span><span class="pill">Creator</span></div><small>Подписчики, просмотры, охват и показатели публикаций.</small></article>
+  <article class="card"><div class="card-head"><div class="route-icon" aria-hidden="true">FB</div><span class="pill">Расширенный сбор</span></div><h3>Facebook Login</h3><p>Нужны связанная Facebook Page и права владельца на неё.</p><div class="route-meta"><span class="pill">Stories webhook</span><span class="pill">Реклама</span></div><small>Выбирать для story_insights и агрегированных media-метрик с рекламой и другими поверхностями.</small></article>
+  <article class="card"><div class="card-head"><div class="route-icon" aria-hidden="true">↔</div><span class="pill">При наличии Portfolio</span></div><h3>Unified Login</h3><p>Подключение через Business Portfolio. Facebook Page не обязательна.</p><div class="route-meta"><span class="pill">Доступ бизнеса</span></div><small>Токен связан с Portfolio, а не с сотрудником. Доступность настройки и срок доступа проверить до выбора.</small></article>
+</div>
+<div class="rule"><span class="symbol" aria-hidden="true">i</span><p><strong>Личные аккаунты:</strong> перед подключением владелец согласует переход в Business или Creator.</p></div>
+<div class="detail-link"><button class="text-button" data-dialog="routes" type="button">Почему выбран Instagram Login ↗</button></div>
+<footer class="slide-footer"><div class="footer-context"><span>Выбор маршрута</span><div class="refs"><a href="#s1">[1]</a><a href="#s3">[3]</a><a href="#s7">[7]</a><a href="#s9">[9]</a></div></div></footer>
+</section>
+
+<section class="page" data-name="Схема" aria-labelledby="flow-heading">
+<header class="section-head"><p class="eyebrow">Компоненты и передача данных</p><h2 id="flow-heading">От подключения до сохранения статистики</h2><p class="lead">Выберите компонент схемы, чтобы увидеть действие и результат этапа.</p></header>
+<div class="flow-layout">
+<div class="flow-panel">
+<svg viewBox="0 0 1000 550" role="group" aria-labelledby="flow-title flow-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="flow-title">Схема подключения и сбора данных</title><desc id="flow-desc">Владелец подтверждает доступ через Instagram. Сервер сохраняет токен в защищённом хранилище. По расписанию сборщик читает реестр аккаунтов, запрашивает Meta API и сохраняет полученный JSON в общую базу. Отчётность читает базу. Состояние доступа ведётся отдельно для каждого аккаунта.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#627985"/></marker></defs>
+<g fill="none" stroke="#627985" stroke-width="2" marker-end="url(#arrow)">
+<path d="M265 85H337"/><path d="M605 85H677"/>
+<path d="M825 145V205H470V246"/>
+<path d="M265 305H337"/><path d="M605 280H677"/><path d="M680 326H607"/>
+<path d="M470 365V446"/><path d="M605 495H677"/>
+</g>
+<text x="302" y="67" text-anchor="middle" class="flow-caption">вход</text>
+<text x="640" y="67" text-anchor="middle" class="flow-caption">code</text>
+<text x="650" y="192" text-anchor="middle" class="flow-caption">IG ID + ссылка на токен</text>
+<text x="642" y="263" text-anchor="middle" class="flow-caption">запрос</text>
+<text x="642" y="351" text-anchor="middle" class="flow-caption">JSON</text>
+<text x="490" y="410" class="flow-caption">запись</text>
+<g class="flow-node" role="button" tabindex="0" data-stage="0" aria-label="Этап 1: владелец аккаунта" aria-pressed="true"><rect class="node-bg" x="15" y="25" width="250" height="120" rx="12"/><text x="36" y="51" class="node-num">01 / ВЛАДЕЛЕЦ</text><text x="36" y="85" class="node-label">Instagram-аккаунт</text><text x="36" y="113" class="node-sub">Business / Creator</text></g>
+<g class="flow-node" role="button" tabindex="0" data-stage="1" aria-label="Этап 2: авторизация" aria-pressed="false"><rect class="node-bg" x="340" y="25" width="265" height="120" rx="12"/><text x="361" y="51" class="node-num">02 / АВТОРИЗАЦИЯ</text><text x="361" y="85" class="node-label">Instagram Login</text><text x="361" y="113" class="node-sub">Подтверждение прав</text></g>
+<g class="flow-node" role="button" tabindex="0" data-stage="2" aria-label="Этап 3: хранение доступа" aria-pressed="false"><rect class="node-bg" x="680" y="25" width="300" height="120" rx="12"/><text x="701" y="51" class="node-num">03 / СЕРВЕР</text><text x="701" y="85" class="node-label">Обмен и хранение токена</text><text x="701" y="113" class="node-sub">Реестр аккаунтов</text></g>
+<g class="flow-node" role="button" tabindex="0" data-stage="3" aria-label="Этап 4: расписание" aria-pressed="false"><rect class="node-bg" x="15" y="248" width="250" height="117" rx="12"/><text x="36" y="275" class="node-num">04 / РАСПИСАНИЕ</text><text x="36" y="308" class="node-label">Планировщик</text><text x="36" y="337" class="node-sub">Запуск по времени</text></g>
+<g class="flow-node" role="button" tabindex="0" data-stage="4" aria-label="Этап 5: сборщик" aria-pressed="false"><rect class="node-bg" x="340" y="248" width="265" height="117" rx="12"/><text x="361" y="275" class="node-num">05 / ОБРАБОТКА</text><text x="361" y="308" class="node-label">Сборщик по аккаунтам</text><text x="361" y="337" class="node-sub">Периоды и повторы</text></g>
+<g class="flow-node" role="button" tabindex="0" data-stage="5" aria-label="Этап 6: Meta API" aria-pressed="false"><rect class="node-bg" x="680" y="248" width="300" height="117" rx="12"/><text x="701" y="275" class="node-num">06 / ИСТОЧНИК</text><text x="701" y="308" class="node-label">Meta API</text><text x="701" y="337" class="node-sub">Профиль и Insights</text></g>
+<g class="flow-node" role="button" tabindex="0" data-stage="6" aria-label="Этап 7: база статистики" aria-pressed="false"><rect class="node-bg" x="340" y="448" width="265" height="92" rx="12"/><text x="361" y="475" class="node-num">07 / ХРАНЕНИЕ</text><text x="361" y="510" class="node-label">Общая база статистики</text></g>
+<g class="flow-node" role="button" tabindex="0" data-stage="7" aria-label="Этап 8: отчётность" aria-pressed="false"><rect class="node-bg" x="680" y="448" width="300" height="92" rx="12"/><text x="701" y="475" class="node-num">08 / РЕЗУЛЬТАТ</text><text x="701" y="510" class="node-label">Система отчётности</text></g>
+<text x="24" y="443" class="flow-caption">Для каждого аккаунта:</text><text x="24" y="469" class="flow-caption">свой ID, доступ и статус.</text><text x="24" y="511" class="flow-caption">Токен не попадает в отчёт.</text>
+</svg>
+</div>
+<aside class="stage-card" aria-live="polite"><div id="stage-number" class="big-index">01</div><h3 id="stage-title">Аккаунт компании</h3><p id="stage-text">Владелец подтверждает управление аккаунтом и профессиональный тип. Подключение повторяется для каждого аккаунта.</p><div class="stage-check"><span>Результат этапа</span><div id="stage-result">Известны аккаунт и ответственный.</div></div></aside>
+</div>
+<div class="flow-caption-row"><span>Несколько аккаунтов</span><span class="line"></span><span>Общий сборщик</span><span class="line"></span><span>Единая база и отчётность</span></div>
+<footer class="slide-footer"><div class="footer-context"><span>Архитектура</span><div class="refs"><a href="#s1">[1]</a><a href="#s3">[3]</a></div></div></footer>
+</section>
+
+<section class="page" data-name="Этапы" aria-labelledby="roles-heading">
+<header class="section-head"><p class="eyebrow">Порядок работ</p><h2 id="roles-heading">Действия по ролям</h2><p class="lead">Сначала подтверждаем доступ на одном аккаунте, затем повторяем подключение для остальных.</p></header>
+<div class="grid cols-3">
+<article class="role-column"><div class="role-title"><span class="role-symbol" aria-hidden="true">◉</span><h3>Владелец аккаунта</h3></div><div class="role-steps">
+<div class="role-step"><span class="step-num">1</span><div><h4>Подготовить аккаунт</h4><p>Подтвердить управление и тип Business / Creator. Согласовать переход, если аккаунт личный.</p></div></div>
+<div class="role-step"><span class="step-num">3</span><div><h4>Подтвердить доступ</h4><p>Принять приглашение в приложение при необходимости. Войти через Instagram и разрешить чтение статистики.</p></div></div>
+<div class="role-step"><span class="step-num">6</span><div><h4>Принять результат</h4><p>Согласовать метрики и сверить первый отчёт с аккаунтом.</p></div></div>
+</div></article>
+<article class="role-column"><div class="role-title"><span class="role-symbol" aria-hidden="true">⌘</span><h3>Технический специалист</h3></div><div class="role-steps">
+<div class="role-step"><span class="step-num">2</span><div><h4>Настроить приложение Meta</h4><p>Instagram product, роли, permissions, HTTPS callback и безопасное хранение доступа.</p></div></div>
+<div class="role-step"><span class="step-num">4</span><div><h4>Проверить первый запрос</h4><p>Получить токен и IG ID. Прочитать профиль, Insights аккаунта и одной публикации.</p></div></div>
+<div class="role-step"><span class="step-num">5</span><div><h4>Включить сбор</h4><p>Подключить базу, расписание и уведомления. Повторить для остальных аккаунтов.</p></div></div>
+</div></article>
+<article class="role-column"><div class="role-title"><span class="role-symbol" aria-hidden="true">↻</span><h3>Автоматическая система</h3></div><div class="role-steps">
+<div class="role-step"><span class="step-num">7</span><div><h4>Получать данные</h4><p>По расписанию собирать профиль, публикации и показатели за нужный период.</p></div></div>
+<div class="role-step"><span class="step-num">8</span><div><h4>Обновлять статистику</h4><p>Сохранять без дублей, повторно загружать недавние периоды и обновлять отчёты.</p></div></div>
+<div class="role-step"><span class="step-num">9</span><div><h4>Поддерживать доступ</h4><p>Обновлять токены. При отзыве уведомлять ответственного для повторного входа.</p></div></div>
+</div></article>
+</div>
+<div class="detail-link"><button class="text-button" data-dialog="setup" type="button">Настройки приложения и первый запрос ↗</button></div>
+<footer class="slide-footer"><div class="footer-context"><span>Ответственность и последовательность</span><div class="refs"><a href="#s1">[1]</a><a href="#s2">[2]</a><a href="#s6">[6]</a></div></div></footer>
+</section>
+
+<section class="page" data-name="Доступ" aria-labelledby="access-heading">
+<header class="section-head"><p class="eyebrow">Авторизация и токены</p><h2 id="access-heading">Подключение и поддержание доступа</h2><p class="lead">Владелец входит самостоятельно. Сервер получает и хранит токен, затем обновляет его до истечения срока.</p></header>
+<div class="access-lane">
+<article class="access-step"><span class="mini-title">01 / Подтверждение</span><div class="term">Один вход</div><p>Instagram Login выдаёт одноразовый код.</p><small>Код действует 1 час.</small></article>
+<article class="access-step"><span class="mini-title">02 / Обмен кода</span><div class="term">~ 1 час</div><p>Короткий Instagram User token.</p><small>Сразу обменять на долгоживущий.</small></article>
+<article class="access-step"><span class="mini-title">03 / Рабочий доступ</span><div class="term">~ 60 дней</div><p>Долгоживущий токен для сбора статистики.</p><small>Срок учитывать по expires_in.</small></article>
+<article class="access-step"><span class="mini-title">04 / Обновление</span><div class="term">Каждые 30 дней</div><p>Рекомендуемый интервал обновления.</p><small>Refresh: токен действующий, старше 24 часов.</small></article>
+</div>
+<div class="access-bottom">
+<article class="card"><span class="mini-title">Разрешения для статистики</span><p><code>instagram_business_basic</code><br><code>instagram_business_manage_insights</code></p><small>Права на публикацию, сообщения и комментарии не нужны.</small></article>
+<article class="card"><span class="mini-title">При истечении или отзыве</span><h3 style="margin-top:17px">Уведомление → повторный вход</h3><p>Истёкший токен не обновляется. Ошибка одного аккаунта не останавливает сбор остальных.</p></article>
+</div>
+<div class="rule"><span class="symbol" aria-hidden="true">↻</span><p><strong>Ежедневный контроль:</strong> срок доступа, последний успешный сбор и ошибки по каждому аккаунту.</p></div>
+<div class="detail-link"><button class="text-button" data-dialog="tokens" type="button">Обмен, refresh и хранение токенов ↗</button></div>
+<footer class="slide-footer"><div class="footer-context"><span>Instagram Login</span><div class="refs"><a href="#s2">[2]</a><a href="#s3">[3]</a></div></div></footer>
+</section>
+
+<section class="page" data-name="Аккаунт" aria-labelledby="account-heading">
+<header class="section-head"><p class="eyebrow">Таблица метрик / аккаунт</p><h2 id="account-heading">Подписчики, просмотры и охват</h2><p class="lead">Храним период статистики и время сбора. Для каждого показателя используем подходящий способ расчёта.</p></header>
+<table class="metric-table" aria-label="Метрики аккаунта"><thead><tr><th>Показатель</th><th>Способ получения</th><th>Условия и ограничения</th></tr></thead><tbody>
+<tr><td><strong>Подписчики</strong><span class="tag">Текущее количество</span></td><td>Поле профиля <code>followers_count</code><p>Ежедневный снимок</p></td><td>Историю накапливаем в своей базе.<p>Снимок не заменяет число подписок и отписок за период.</p></td></tr>
+<tr><td><strong>Просмотры</strong><span class="tag">Отображения и воспроизведения</span></td><td>Account Insights: <code>views</code><p>За выбранный период</p></td><td>Не уникальная аудитория.<p>Состав метрики проверяем на пилоте. Старые impressions и plays не используем.</p></td></tr>
+<tr><td><strong>Охват</strong><span class="tag">Уникальная аудитория</span></td><td>Account Insights: <code>reach</code><p>Отдельный запрос за нужный интервал</p></td><td>Оценочная метрика, включает рекламу по определению Meta.<p>Нельзя складывать дневные охваты или охваты аккаунтов для получения общей уникальной аудитории.</p></td></tr>
+<tr><td><strong>Подписки и отписки</strong><span class="tag">Дополнительно</span></td><td>Account Insights: <code>follows_and_unfollows</code><p>За выбранный период</p></td><td>Недоступно при числе подписчиков менее 100.<p>Не путать с общим числом подписчиков.</p></td></tr>
+</tbody></table>
+<div class="detail-link"><button class="text-button" data-dialog="metrics" type="button">Периоды и параметры запросов ↗</button></div>
+<footer class="slide-footer"><div class="footer-context"><span>Профиль и Account Insights</span><div class="refs"><a href="#s1">[1]</a><a href="#s4">[4]</a><a href="#s8">[8]</a></div></div></footer>
+</section>
+
+<section class="page" data-name="Публикации" aria-labelledby="media-heading">
+<header class="section-head"><p class="eyebrow">Таблица метрик / контент</p><h2 id="media-heading">Показатели отдельных публикаций</h2><p class="lead">Получаем список публикаций, затем запрашиваем Media Insights по ID каждой публикации.</p></header>
+<table class="metric-table" aria-label="Метрики публикаций"><thead><tr><th>Формат и показатели</th><th>Способ получения</th><th>Условия и ограничения</th></tr></thead><tbody>
+<tr><td><strong>Feed и Reels</strong><p>Просмотры, охват, лайки, комментарии, сохранения, отправки и взаимодействия</p></td><td>Media Insights<p><code>views, reach, likes, comments, saved, shares, total_interactions</code></p></td><td>Накопительные значения за время жизни публикации.<p>Набор зависит от формата. Views, likes, comments и total_interactions учитывают органику; рекламу согласовываем отдельно.</p></td></tr>
+<tr><td><strong>Удержание Reels</strong><p>Среднее и общее время просмотра</p></td><td>Media Insights<p><code>ig_reels_avg_watch_time</code><br><code>ig_reels_video_view_total_time</code></p></td><td>Только Reels.<p>Проверить единицы в ответе. Не применять к фото и Stories.</p></td></tr>
+<tr><td><strong>Stories</strong><p>Просмотры, охват, отправки и взаимодействия</p></td><td>Media Insights<p><code>views, reach, shares, total_interactions</code></p></td><td>Доступность ограничена 24 часами; возможна задержка расчёта.<p>Значения ниже 5 могут дать ошибку 10. Для обязательной полноты проверить Facebook Login и story_insights webhook.</p></td></tr>
+</tbody></table>
+<div class="compare-strip"><div><b>Карусель</b><span>Insights целой публикации, не отдельных вложений.</span></div><div><b>Накопительные значения</b><span>Хранить снимки; не суммировать как новые просмотры.</span></div><div><b>Реклама и Facebook</b><span>Отдельно определить охват поверхностей и маршрут доступа.</span></div></div>
+<footer class="slide-footer"><div class="footer-context"><span>Media Insights</span><div class="refs"><a href="#s3">[3]</a><a href="#s5">[5]</a></div></div></footer>
+</section>
+
+<section class="page" data-name="Сбор данных" aria-labelledby="schedule-heading">
+<header class="section-head"><p class="eyebrow">Регулярное обновление</p><h2 id="schedule-heading">Расписание и хранение статистики</h2><p class="lead">Один процесс обходит реестр аккаунтов. У каждого свой доступ, статус загрузки и история ошибок.</p></header>
+<div class="schedule" role="table" aria-label="Рекомендуемое расписание сбора">
+<div class="schedule-head" role="row"><span role="columnheader">Что собираем</span><div role="columnheader" aria-label="Дни недели"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div><span role="columnheader" style="padding-left:26px">Правило обновления</span></div>
+<div class="schedule-row" role="row"><div role="cell"><strong>Аккаунт</strong><small>Профиль и суточные Insights</small></div><div class="day-marks" role="cell" aria-label="Каждый день"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="description" role="cell">Ежедневно. Последние 3-7 дней повторно для уточнения данных.</div></div>
+<div class="schedule-row" role="row"><div role="cell"><strong>Feed и Reels</strong><small>Показатели публикаций</small></div><div class="day-marks" role="cell" aria-label="Ежедневный поиск и обновление публикаций"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="description" role="cell">Обнаружение новых публикаций и повторный сбор по согласованному окну.</div></div>
+<div class="schedule-row" role="row"><div role="cell"><strong>Stories</strong><small>Отдельный режим сбора</small></div><div class="day-marks" role="cell"><span class="window">Опрос каждые 1-3 часа, если включены</span></div><div class="description" role="cell">Проверить обнаружение и полноту. Instagram Login без Insights webhook.</div></div>
+</div>
+<div class="retention" aria-label="Ограничения доступности Meta">
+<article class="card"><span class="mini-title">Stories</span><div class="term">24 часа</div><p>Короткое окно доступности</p></article>
+<article class="card"><span class="mini-title">Расчёт метрик</span><div class="term">До 48 часов</div><p>Возможная задержка данных</p></article>
+<article class="card"><span class="mini-title">Account Insights</span><div class="term">До 90 дней</div><p>История на стороне Meta</p></article>
+<article class="card"><span class="mini-title">Media Insights</span><div class="term">До 2 лет</div><p>Без гарантии для всех метрик</p></article>
+</div>
+<div class="detail-link"><button class="text-button" data-dialog="storage" type="button">Структура базы, повторы и загрузка истории ↗</button></div>
+<footer class="slide-footer"><div class="footer-context"><span>Планировщик → сборщик → база → отчётность</span><div class="refs"><a href="#s3">[3]</a><a href="#s4">[4]</a><a href="#s5">[5]</a></div></div></footer>
+</section>
+
+<section class="page" data-name="Проверки" aria-labelledby="checks-heading">
+<header class="section-head"><p class="eyebrow">План проверки</p><h2 id="checks-heading">Контрольные точки перед запуском</h2><p class="lead">Каждый этап завершается проверяемым результатом. Проверки повторяются для всех аккаунтов.</p></header>
+<div class="check-grid">
+<article class="check-card"><div class="check-top"><span class="card-index">01 / ДОСТУП</span><span class="pill">Владелец + специалист</span></div><h3>Авторизация</h3><p>Проверить вход, отказ, выданные права и срок токена.</p><div class="expected"><span>✓</span> Аккаунт разрешил чтение статистики</div></article>
+<article class="check-card"><div class="check-top"><span class="card-index">02 / ИДЕНТИФИКАЦИЯ</span></div><h3>Правильный аккаунт</h3><p>Сверить username и IG ID; прочитать профиль и одну публикацию.</p><div class="expected"><span>✓</span> Данные принадлежат нужному аккаунту</div></article>
+<article class="check-card"><div class="check-top"><span class="card-index">03 / ПОКАЗАТЕЛИ</span></div><h3>Доступность метрик</h3><p>Проверить период, формат и сравнить с Instagram с учётом задержек и рекламы.</p><div class="expected"><span>✓</span> Метрики и ограничения согласованы</div></article>
+<article class="check-card"><div class="check-top"><span class="card-index">04 / ХРАНЕНИЕ</span></div><h3>Повторный сбор</h3><p>Загрузить дважды, подключить второй аккаунт, проверить даты и разделение данных.</p><div class="expected"><span>✓</span> Нет дублей и смешения аккаунтов</div></article>
+<article class="check-card"><div class="check-top"><span class="card-index">05 / РАСПИСАНИЕ</span></div><h3>Обновление доступа</h3><p>Проверить refresh токена старше 24 часов и несколько запусков по расписанию.</p><div class="expected"><span>✓</span> Доступ продлён, интервалы не пропущены</div></article>
+<article class="check-card"><div class="check-top"><span class="card-index">06 / ВОССТАНОВЛЕНИЕ</span></div><h3>Сбой одного аккаунта</h3><p>Отключить один доступ, проверить уведомление, повторный вход и догрузку.</p><div class="expected"><span>✓</span> Остальные аккаунты продолжают сбор</div></article>
+</div>
+<div class="rule"><span class="symbol" aria-hidden="true">✓</span><p><strong>Критерий запуска:</strong> согласованные метрики доступны, сохраняются без дублей, доступ обновляется, ошибки видны ответственному.</p></div>
+<div class="detail-link"><button class="text-button" data-dialog="troubleshooting" type="button">Типовые проблемы и диагностика ↗</button></div>
+<footer class="slide-footer"><div class="footer-context"><span>Приёмка и восстановление</span><div class="refs"><a href="#s2">[2]</a><a href="#s4">[4]</a><a href="#s5">[5]</a></div></div></footer>
+</section>
+
+<section class="page" data-name="Вопросы" aria-labelledby="questions-heading">
+<header class="section-head"><p class="eyebrow">До начала работ</p><h2 id="questions-heading">Сведения и доступы от компании</h2><p class="lead">Ответы определяют маршрут подключения, объём данных и требования к инфраструктуре.</p></header>
+<div class="questions">
+<article class="question"><span class="number">01</span><div><h3>Аккаунты и владельцы</h3><p>Какие аккаунты подключаем? Тип, ответственный, собственные или клиентские? Кто подтверждает вход?</p></div></article>
+<article class="question"><span class="number">02</span><div><h3>Ресурсы Meta</h3><p>Есть ли приложение, Pages и Business Portfolio? Кто выдаёт роли и отвечает за App Review и Business Verification?</p></div></article>
+<article class="question"><span class="number">03</span><div><h3>Состав показателей</h3><p>Только Instagram и органика или также реклама и Facebook? Нужны ли Stories, карусели и удержание Reels?</p></div></article>
+<article class="question"><span class="number">04</span><div><h3>Периоды и обновление</h3><p>Какая история, частота и часовой пояс? Допустима ли задержка до 48 часов? Как показывать пропуски?</p></div></article>
+<article class="question"><span class="number">05</span><div><h3>Система отчётности</h3><p>Куда сохранять данные: БД, таблица, BI или CRM? Кто выдаёт технический доступ? Какие поля и сроки хранения нужны?</p></div></article>
+<article class="question"><span class="number">06</span><div><h3>Размещение и сопровождение</h3><p>Есть ли корпоративный сервер для интеграции или нужно предложить размещение? Кто будет получать уведомления о сбоях?</p></div></article>
+</div>
+<footer class="slide-footer"><div class="footer-context"><span>Входные данные для реализации</span></div></footer>
+</section>
+
+<section class="page" data-name="Источники" aria-labelledby="sources-heading">
+<header class="section-head"><p class="eyebrow">Справочные материалы</p><h2 id="sources-heading">Документация Meta</h2><p class="lead">При настройке сверить выбранную версию API, доступность permissions и ответы на пилотном аккаунте.</p></header>
+<ol class="sources">
+<li id="s1" tabindex="-1"><span class="source-index">01</span><div><a href="https://developers.facebook.com/documentation/instagram-platform/instagram-api-with-instagram-login/get-started">Instagram Login / Get Started ↗</a><small>Профиль, идентификаторы, followers_count и публикации</small></div></li>
+<li id="s2" tabindex="-1"><span class="source-index">02</span><div><a href="https://developers.facebook.com/documentation/instagram-platform/instagram-api-with-instagram-login/business-login">Business Login for Instagram ↗</a><small>Авторизация, обмен токена и refresh</small></div></li>
+<li id="s3" tabindex="-1"><span class="source-index">03</span><div><a href="https://developers.facebook.com/documentation/instagram-platform/insights">Instagram Insights ↗</a><small>Разрешения, access levels и история</small></div></li>
+<li id="s4" tabindex="-1"><span class="source-index">04</span><div><a href="https://developers.facebook.com/docs/instagram-platform/api-reference/instagram-user/insights/">Account Insights ↗</a><small>Показатели аккаунта, периоды и ограничения</small></div></li>
+<li id="s5" tabindex="-1"><span class="source-index">05</span><div><a href="https://developers.facebook.com/docs/instagram-platform/reference/instagram-media/insights/">Media Insights ↗</a><small>Метрики Feed, Reels и Stories</small></div></li>
+<li id="s6" tabindex="-1"><span class="source-index">06</span><div><a href="https://developers.facebook.com/documentation/instagram-platform/overview">Platform Overview ↗</a> · <a href="https://developers.facebook.com/documentation/instagram-platform/create-an-instagram-app">App Setup ↗</a><small>Роли, Standard / Advanced Access и review</small></div></li>
+<li id="s7" tabindex="-1"><span class="source-index">07</span><div><a href="https://developers.facebook.com/documentation/instagram-platform/instagram-api-with-facebook-login/get-started">Facebook Login / Get Started ↗</a><small>Связь с Page и получение IG ID</small></div></li>
+<li id="s8" tabindex="-1"><span class="source-index">08</span><div><a href="https://developers.facebook.com/documentation/instagram-platform/changelog.md">Platform Changelog ↗</a><small>Изменения views и устаревшие метрики</small></div></li>
+<li id="s9" tabindex="-1"><span class="source-index">09</span><div><a href="https://developers.facebook.com/documentation/instagram-platform/instagram-api-with-unified-login">Unified Login ↗</a><small>Business Portfolio и системный токен</small></div></li>
+</ol>
+<footer class="slide-footer"><div class="footer-context"><span>Официальные руководства и справочники</span></div></footer>
+</section>
+</main>
+</div>
+</div>
+
+<dialog id="details" aria-labelledby="dialog-title"><header class="dialog-head"><h2 id="dialog-title"></h2><button type="button" id="close-dialog" aria-label="Закрыть подробности">×</button></header><div class="dialog-body" id="dialog-body"></div></dialog>
+<template id="routes">
+<h3>Instagram Login: основной вариант</h3><p>Подходит для сбора подписчиков, просмотров, охвата и статистики публикаций. Владелец подключает профессиональный аккаунт напрямую через Instagram. Создавать или связывать страницу Facebook не нужно.</p><h3>Когда нужен Facebook Login</h3><p>Если нужен расширенный сбор Stories или показатели публикаций с учётом рекламы и Facebook. Для подключения потребуется связанная страница Facebook и права на неё.</p><h3>Когда рассмотреть Unified Login</h3><p>Если компания уже управляет ресурсами через Business Portfolio в Meta. Доступ привязывается к компании, а не к отдельному сотруднику. Для базового сбора создавать Portfolio специально не требуется.</p>
+</template>
+<template id="setup">
+<h3>Настройка приложения</h3><ol><li>Создать приложение Meta с Instagram. Назначить администраторов, добавить подключаемые профессиональные аккаунты и проверить принятие приглашений.</li><li>Для собственных / управляемых и добавленных в App Dashboard аккаунтов применяется Standard Access. Для сторонних аккаунтов без нужной роли нужен Advanced Access, App Review и Business Verification.</li><li>Настроить HTTPS redirect URI, политику конфиденциальности, отзыв доступа и удаление данных. Redirect URI должен точно совпадать; сервер проверяет OAuth state.</li><li>Запросить <code>instagram_business_basic</code> и <code>instagram_business_manage_insights</code>. Проверить выданные права, а не только запрошенные.</li></ol><h3>От авторизации к первому запросу</h3><p>Владелец подтверждает доступ → сервер обменивает code на короткий токен → получает долгоживущий токен → запрашивает <code>/me?fields=user_id,username,followers_count</code>.</p><p>Сохранить IG ID, username и ссылку на credential. Затем проверить <code>/{ig_id}/insights</code>, <code>/{ig_id}/media</code> и <code>/{media_id}/insights</code>. Идентификаторы <code>id</code> и <code>user_id</code> различать; в запросах использовать ID нужного ресурса. Page ID не является IG ID.</p><p>Базовый host основного маршрута: <code>graph.instagram.com</code>. Версию API закрепить в конфигурации; в текущих примерах Meta используется <code>v26.0</code>.</p>
+</template>
+<template id="tokens">
+<table><thead><tr><th>Операция</th><th>Endpoint</th><th>Параметр</th></tr></thead><tbody><tr><td>Обмен кода</td><td><code>POST api.instagram.com/oauth/access_token</code></td><td><code>grant_type=authorization_code</code></td></tr><tr><td>Долгоживущий токен</td><td><code>GET graph.instagram.com/access_token</code></td><td><code>grant_type=ig_exchange_token</code></td></tr><tr><td>Обновление</td><td><code>GET graph.instagram.com/refresh_access_token</code></td><td><code>grant_type=ig_refresh_token</code></td></tr></tbody></table><h3>Условия обновления</h3><p>Действующий токен старше 24 часов, выдано <code>instagram_business_basic</code>. После успешного refresh сохранить возвращённый токен и новый срок по <code>expires_in</code>. Рекомендуется проверять срок ежедневно, обновлять примерно через 30 дней и повторять временно неудачные попытки до истечения.</p><h3>Безопасность и восстановление</h3><p>Токен и app secret хранятся на сервере в secret store / credentials. В реестре аккаунтов только ссылка на credential и срок. В логах, URL отчётов и таблицах аналитики секретов нет. При отзыве или истечении уведомить владельца и повторить авторизацию. Данные удаляются по согласованным правилам и запросу владельца.</p>
+</template>
+<template id="metrics">
+<table><thead><tr><th>Показатель</th><th>Источник</th><th>Параметры</th></tr></thead><tbody><tr><td>Подписчики</td><td><code>/me?fields=followers_count</code></td><td>Текущий снимок, без исторического периода</td></tr><tr><td>Просмотры</td><td><code>/{ig_id}/insights?metric=views</code></td><td><code>period=day</code>, <code>metric_type=total_value</code>, <code>since/until</code></td></tr><tr><td>Охват</td><td><code>/{ig_id}/insights?metric=reach</code></td><td><code>period=day</code>, <code>time_series</code> или <code>total_value</code>, <code>since/until</code></td></tr><tr><td>Подписки / отписки</td><td><code>/{ig_id}/insights?metric=follows_and_unfollows</code></td><td><code>period=day</code>, <code>metric_type=total_value</code>, <code>since/until</code>; от 100 подписчиков</td></tr><tr><td>Публикации</td><td><code>/{media_id}/insights</code></td><td>Накопительные <code>lifetime</code>; совместимость метрик зависит от media type</td></tr></tbody></table><p>Метрики с разными параметрами запрашивать отдельно. Разбивки проверять на пилоте: некоторые сочетания несовместимы. Для views в справочнике есть расхождение названия follower breakdown; основной сбор без такой разбивки.</p><p>За неделю и месяц охват запрашивать за целый интервал, если API его допускает. Максимальный размер окна для каждого набора проверить до загрузки истории. Пустой набор данных не является нулевым значением.</p>
+</template>
+<template id="storage">
+<h3>Компоненты</h3><p>Рекомендуемый стек: n8n или серверный сборщик → PostgreSQL → существующая BI / CRM. Окончательный выбор зависит от системы отчётности компании.</p><h3>Реестр аккаунтов</h3><p>IG ID, username, способ подключения, ссылка на credential, выданные права, срок токена, часовой пояс, время последнего успешного сбора и статус. Username может меняться; основной ключ ресурса ID.</p><h3>Запись статистики</h3><p>Account / media ID, метрика, значение, период и его границы, разбивка, время сбора и версия API. Upsert по ресурсу, метрике, периоду и разбивке предотвращает дубли. Накопительные media-значения сохраняются как снимки.</p><h3>Повторы и история</h3><p>Обходить все страницы публикаций. Начальную историю загружать небольшими окнами, проверяя доступность, в том числе до перехода в профессиональный аккаунт. Глубина хранения Meta не гарантирует наличие каждой метрики за весь срок.</p><p>При лимитах и временных сбоях использовать ограниченные повторы с растущей задержкой и учитывать заголовки Meta. Ошибки доступа изолировать по аккаунтам. После восстановления догружать пропуски. Для Stories отдельно проверить обнаружение активных публикаций и доступность метрик до включения в обязательный объём.</p>
+</template>
+<template id="troubleshooting">
+<table><thead><tr><th>Проблема</th><th>Диагностика</th></tr></thead><tbody><tr><td>Не проходит авторизация</td><td>Redirect URI, state, роли, принятые приглашения, app mode и уровень доступа. Code одноразовый.</td></tr><tr><td>Нет разрешения / токен недействителен</td><td>Выданные scopes, срок, app и API host. После отзыва нужен новый вход. Для Facebook Login проверить Page и условные Business Manager permissions.</td></tr><tr><td>Пустой ответ или ошибка метрики</td><td>Одна метрика без разбивки: формат публикации, даты, period / metric_type, порог подписчиков и задержка до 48 часов. Не заменять отсутствие данных нулём.</td></tr><tr><td>Проблема со Stories</td><td>Срок доступности 24 часа, задержка, малые значения и ошибка 10. При обязательной полноте проверить Facebook Login и story_insights.</td></tr><tr><td>Числа отличаются от Instagram</td><td>Тот же аккаунт, публикация, интервал, часовой пояс, organic / paid и Instagram / Facebook. Учитывать задержку и уникальность охвата.</td></tr><tr><td>Лимит или временный сбой</td><td>Проверить ответ и заголовки Meta, уменьшить параллельность, применить backoff. Ошибка одного аккаунта не блокирует остальные.</td></tr><tr><td>Дубли или пропуски</td><td>Проверить ключ upsert, интервалы, страницы media и последний успешный запуск. Повторить загрузку пропущенного окна.</td></tr></tbody></table>
+</template>
+<script>
+(() => {
+  'use strict';
+  const slides = [...document.querySelectorAll('.page')];
+  const nav = document.querySelector('#slide-nav');
+  const chevron = direction => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${direction === 'left' ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'}"/></svg>`;
+  let active = 0;
+  slides.forEach((slide, index) => {
+    slide.id = `slide-${index + 1}`;
+    slide.querySelector('h1, h2').tabIndex = -1;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'nav-item';
+    const number = document.createElement('span');
+    number.className = 'nav-number';
+    number.textContent = String(index + 1).padStart(2, '0');
+    button.append(number, document.createTextNode(slide.dataset.name));
+    button.addEventListener('click', () => show(index, true));
+    nav.append(button);
+    const pager = document.createElement('div');
+    pager.className = 'pager';
+    pager.setAttribute('aria-label', 'Управление слайдами');
+    const previous = document.createElement('button');
+    previous.type = 'button'; previous.setAttribute('aria-label', 'Предыдущий слайд');
+    previous.innerHTML = chevron('left'); previous.disabled = index === 0;
+    previous.addEventListener('click', () => show(index - 1, true));
+    const counter = document.createElement('span');
+    counter.className = 'counter'; counter.textContent = `${String(index + 1).padStart(2, '0')} / ${slides.length}`;
+    const next = document.createElement('button');
+    next.type = 'button'; next.setAttribute('aria-label', 'Следующий слайд');
+    next.innerHTML = chevron('right'); next.disabled = index === slides.length - 1;
+    next.addEventListener('click', () => show(index + 1, true));
+    pager.append(previous, counter, next);
+    slide.querySelector('.slide-footer').append(pager);
+  });
+  const navButtons = [...nav.children];
+  function show(index, updateHash = false) {
+    active = Math.max(0, Math.min(index, slides.length - 1));
+    slides.forEach((slide, i) => { slide.hidden = i !== active; });
+    navButtons.forEach((button, i) => {
+      if (i === active) button.setAttribute('aria-current', 'step');
+      else button.removeAttribute('aria-current');
+    });
+    document.title = `${slides[active].dataset.name} | LD LATTE / Instagram`;
+    if (updateHash) {
+      location.hash = slides[active].id;
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      slides[active].querySelector('h1, h2').focus({ preventScroll: true });
+    }
+  }
+  function followHash() {
+    const hash = location.hash.slice(1);
+    const target = hash ? document.getElementById(hash) : null;
+    const slide = target?.closest('.page');
+    show(slide ? slides.indexOf(slide) : 0);
+    if (slide && target !== slide) target.focus({ preventScroll: true });
+  }
+  const stages = [
+    ['Аккаунт компании', 'Владелец подтверждает управление аккаунтом и профессиональный тип. Подключение повторяется для каждого аккаунта.', 'Известны аккаунт и ответственный.'],
+    ['Подтверждение доступа', 'Владелец входит в Instagram и разрешает чтение статистики. Сервер проверяет state и получает одноразовый code.', 'Выданы необходимые разрешения.'],
+    ['Хранение доступа', 'Сервер меняет код на токен и получает долгоживущий доступ. Токен хранится отдельно, в реестре только ссылка и срок.', 'IG ID связан с защищённым credential.'],
+    ['Запуск по расписанию', 'Ежедневный сбор и повторная загрузка недавних периодов. Stories обрабатываются отдельно, чаще.', 'Запуск не требует ручного действия.'],
+    ['Обработка аккаунтов', 'Сборщик читает реестр, проходит страницы публикаций и задаёт периоды. Сбой одного аккаунта изолирован.', 'Запросы сформированы для каждого аккаунта.'],
+    ['Получение статистики', 'Meta возвращает профиль, показатели аккаунта и публикаций. Отсутствие данных отличается от нуля.', 'Получен ответ с согласованными метриками.'],
+    ['Запись в базу', 'Данные записываются с ID ресурса, метрикой, периодом и временем сбора. Повторная загрузка не создаёт дублей.', 'Сохранена история статистики.'],
+    ['Обновление отчёта', 'Отчётность читает общую базу. Доступны фильтры по аккаунту, периоду и публикации, видна свежесть данных.', 'Данные доступны в системе компании.']
+  ];
+  const nodes = [...document.querySelectorAll('[data-stage]')];
+  function selectStage(index) {
+    nodes.forEach((node, i) => node.setAttribute('aria-pressed', String(i === index)));
+    document.querySelector('#stage-number').textContent = String(index + 1).padStart(2, '0');
+    document.querySelector('#stage-title').textContent = stages[index][0];
+    document.querySelector('#stage-text').textContent = stages[index][1];
+    document.querySelector('#stage-result').textContent = stages[index][2];
+  }
+  nodes.forEach((node, index) => {
+    node.addEventListener('click', () => selectStage(index));
+    node.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectStage(index); }
+      if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+        event.preventDefault();
+        const next = (index + (event.key === 'ArrowRight' ? 1 : -1) + nodes.length) % nodes.length;
+        selectStage(next); nodes[next].focus({ preventScroll: true });
+      }
+    });
+  });
+  const dialog = document.querySelector('#details');
+  document.querySelectorAll('[data-dialog]').forEach(button => {
+    button.addEventListener('click', () => {
+      document.querySelector('#dialog-title').textContent = button.textContent.replace(' ↗', '');
+      document.querySelector('#dialog-body').replaceChildren(document.getElementById(button.dataset.dialog).content.cloneNode(true));
+      dialog.showModal();
+      dialog.scrollTop = 0;
+    });
+  });
+  document.querySelector('#close-dialog').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', event => { if (event.target === dialog) { const rect = dialog.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close(); } });
+  function buildPrintDeck() {
+    document.querySelector('.pdf-deck')?.remove();
+    const printDeck = document.createElement('div');
+    printDeck.className = 'pdf-deck';
+    const entries = [];
+    function linkFrom(button, href) {
+      const link = document.createElement('a');
+      link.className = button.className;
+      link.innerHTML = button.innerHTML;
+      link.href = href;
+      if (button.hasAttribute('aria-label')) link.setAttribute('aria-label', button.getAttribute('aria-label'));
+      return link;
+    }
+    function remapIds(page) {
+      const elements = [page, ...page.querySelectorAll('*')];
+      const ids = new Map(elements.filter(node => node.id).map(node => [node.id, `${page.id}-${node.id}`]));
+      elements.forEach(node => {
+        if (node.id) node.id = ids.get(node.id);
+        for (const name of ['aria-labelledby', 'aria-describedby']) {
+          if (node.hasAttribute(name)) node.setAttribute(name, node.getAttribute(name).split(' ').map(id => ids.get(id) || id).join(' '));
+        }
+        for (const name of ['marker-end', 'marker-start', 'fill', 'clip-path']) {
+          if (node.hasAttribute(name)) node.setAttribute(name, node.getAttribute(name).replace(/url\(#([^)]*)\)/g, (_, id) => `url(#${ids.get(id) || id})`));
+        }
+      });
+    }
+    function addSheet(page, id, owner, back) {
+      page.hidden = false;
+      page.id = id;
+      const sheet = document.createElement('section');
+      sheet.className = 'pdf-sheet';
+      sheet.id = id;
+      remapIds(page);
+      const sidebar = document.querySelector('body > .sidebar').cloneNode(true);
+      sidebar.querySelectorAll('ld-navigation, .system-footer').forEach(node => node.remove());
+      sidebar.removeAttribute('aria-label');
+      sidebar.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+      sidebar.querySelectorAll('.nav-item').forEach((button, index) => {
+        const link = linkFrom(button, `#pdf-slide-${index + 1}`);
+        if (index === owner) link.setAttribute('aria-current', 'step');
+        else link.removeAttribute('aria-current');
+        button.replaceWith(link);
+      });
+      sidebar.querySelectorAll('.sidebar-print').forEach(node => node.remove());
+      page.querySelectorAll('a[href^="#"]').forEach(link => {
+        const target = link.getAttribute('href').slice(1);
+        link.setAttribute('href', /^s\d+$/.test(target) ? `#pdf-source-${target}` : `#pdf-${target}`);
+      });
+      page.querySelectorAll('.sources li').forEach((node, index) => { node.id = `pdf-source-s${index + 1}`; });
+      page.querySelectorAll('[data-dialog]').forEach(button => button.replaceWith(linkFrom(button, `#pdf-detail-${button.dataset.dialog}`)));
+      page.querySelectorAll('[data-stage]').forEach((node, index) => {
+        node.removeAttribute('role'); node.removeAttribute('tabindex');
+        const link = document.createElementNS('http://www.w3.org/2000/svg', 'a');
+        link.setAttribute('href', `#pdf-stage-${index + 1}`);
+        node.replaceWith(link); link.append(node);
+      });
+      const footer = page.querySelector('.slide-footer');
+      footer.querySelector('.pager')?.remove();
+      if (back) {
+        const context = footer.querySelector('.footer-context');
+        context.replaceChildren();
+        const link = document.createElement('a');
+        link.className = 'return-link'; link.href = `#pdf-slide-${owner + 1}`;
+        link.textContent = `‹ ${slides[owner].dataset.name}`;
+        context.append(link);
+      }
+      const workspace = document.createElement('div'); workspace.className = 'workspace';
+      const main = document.createElement('main'); main.append(page); workspace.append(main);
+      sheet.append(sidebar, workspace); printDeck.append(sheet); entries.push({ sheet, footer });
+    }
+    slides.forEach((slide, index) => {
+      const page = slide.cloneNode(true);
+      if (index === 1) {
+        page.querySelectorAll('[data-stage]').forEach((node, i) => node.setAttribute('aria-pressed', String(i === 0)));
+        for (const [id, text] of [['stage-number', '01'], ['stage-title', stages[0][0]], ['stage-text', stages[0][1]], ['stage-result', stages[0][2]]]) page.querySelector(`#${id}`).textContent = text;
+      }
+      addSheet(page, `pdf-slide-${index + 1}`, index, false);
+    });
+    document.querySelectorAll('#deck [data-dialog]').forEach(button => {
+      const owner = slides.indexOf(button.closest('.page'));
+      const page = document.createElement('section'); page.className = 'page';
+      const header = document.createElement('header'); header.className = 'section-head';
+      const eyebrow = document.createElement('p'); eyebrow.className = 'eyebrow'; eyebrow.textContent = slides[owner].dataset.name;
+      const heading = document.createElement('h2'); heading.textContent = button.textContent.replace(' ↗', '');
+      header.append(eyebrow, heading);
+      const content = document.createElement('div'); content.className = 'detail-content';
+      content.append(document.getElementById(button.dataset.dialog).content.cloneNode(true));
+      const footer = document.createElement('footer'); footer.className = 'slide-footer';
+      const context = document.createElement('div'); context.className = 'footer-context'; footer.append(context);
+      page.append(header, content, footer);
+      addSheet(page, `pdf-detail-${button.dataset.dialog}`, owner, true);
+    });
+    stages.forEach((stage, index) => {
+      const page = slides[1].cloneNode(true);
+      page.querySelectorAll('[data-stage]').forEach((node, i) => node.setAttribute('aria-pressed', String(i === index)));
+      for (const [id, text] of [['stage-number', String(index + 1).padStart(2, '0')], ['stage-title', stage[0]], ['stage-text', stage[1]], ['stage-result', stage[2]]]) page.querySelector(`#${id}`).textContent = text;
+      addSheet(page, `pdf-stage-${index + 1}`, 1, true);
+    });
+    entries.forEach(({ footer }, index) => {
+      const pager = document.createElement('div'); pager.className = 'pager';
+      for (const direction of [-1, 1]) {
+        if (direction === 1) {
+          const counter = document.createElement('span'); counter.className = 'counter';
+          counter.textContent = `${String(index + 1).padStart(2, '0')} / ${entries.length}`; pager.append(counter);
+        }
+        const link = document.createElement('a');
+        const target = entries[index + direction];
+        link.href = `#${target ? target.sheet.id : entries[index].sheet.id}`;
+        link.innerHTML = chevron(direction === -1 ? 'left' : 'right');
+        if (!target) link.setAttribute('aria-disabled', 'true');
+        pager.append(link);
+      }
+      footer.append(pager);
+    });
+    document.body.append(printDeck);
+  }
+  window.addEventListener('beforeprint', buildPrintDeck);
+  document.addEventListener('keydown', event => {
+    if (dialog.open || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.target.closest('button, a, input, select, textarea, [role="button"]')) return;
+    const target = { ArrowLeft: active - 1, ArrowRight: active + 1, Home: 0, End: slides.length - 1 }[event.key];
+    if (target === undefined) return;
+    event.preventDefault(); show(target, true);
+  });
+  window.addEventListener('hashchange', followHash);
+  document.body.classList.add('enhanced');
+  followHash();
+})();
+</script>
+</body>
+</html>
